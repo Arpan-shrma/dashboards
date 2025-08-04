@@ -1,553 +1,1023 @@
-<!-- Add this CSS to your existing styles -->
-<style>
-.quiz-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kids Environmental Explorer</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-.age-selector {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 30px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
+    body {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: linear-gradient(135deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+      background-size: 400% 400%;
+      animation: gradientShift 8s ease infinite;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
 
-.age-btn {
-  padding: 12px 24px;
-  border: 2px solid #3182ce;
-  border-radius: 25px;
-  background: white;
-  color: #3182ce;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
 
-.age-btn.active {
-  background: #3182ce;
-  color: white;
-}
+    /* Back to Home Button */
+    .back-to-home {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+      border: 3px solid #ff6b6b;
+      color: #ff6b6b;
+      padding: 12px 20px;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1000;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-.age-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(49, 130, 206, 0.3);
-}
+    .back-to-home:hover {
+      background: #ff6b6b;
+      color: white;
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 8px 25px rgba(255,107,107,0.3);
+    }
 
-.quiz-section {
-  display: none;
-}
+    /* Hero Section */
+    .hero {
+      padding: 80px 20px 40px;
+      text-align: center;
+      color: white;
+      position: relative;
+    }
 
-.quiz-section.active {
-  display: block;
-}
+    .hero::before {
+      content: '🌟⭐🦋🌈🌺🐛🌟⭐🦋🌈🌺🐛';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      font-size: 2rem;
+      opacity: 0.3;
+      animation: float 6s ease-in-out infinite;
+      z-index: 1;
+    }
 
-.question-card {
-  background: white;
-  border-radius: 16px;
-  padding: 24px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  border-left: 4px solid #667eea;
-}
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
 
-.question-number {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  display: inline-block;
-  margin-bottom: 16px;
-}
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 800px;
+      margin: 0 auto;
+    }
 
-.question-text {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #2d3748;
-  margin-bottom: 20px;
-  line-height: 1.5;
-}
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      font-weight: 800;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      animation: bounce 2s ease-in-out infinite;
+    }
 
-.answer-options {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-10px); }
+      60% { transform: translateY(-5px); }
+    }
 
-.answer-btn {
-  padding: 16px 20px;
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
-  background: white;
-  color: #4a5568;
-  cursor: pointer;
-  font-size: 1rem;
-  text-align: left;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+    .hero p {
+      font-size: 1.4rem;
+      margin-bottom: 40px;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    }
 
-.answer-btn:hover {
-  border-color: #3182ce;
-  background: #f7fafc;
-  transform: translateX(5px);
-}
+    /* Score Display */
+    .score-display {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+      border: 3px solid #4ecdc4;
+      border-radius: 20px;
+      padding: 15px 25px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #4ecdc4;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      z-index: 1000;
+      animation: pulse 2s ease-in-out infinite;
+    }
 
-.answer-btn.correct {
-  background: #c6f6d5;
-  border-color: #68d391;
-  color: #2f855a;
-}
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
 
-.answer-btn.incorrect {
-  background: #fed7d7;
-  border-color: #feb2b2;
-  color: #c53030;
-}
+    /* Main Container */
+    .container {
+      background: rgba(255,255,255,0.95);
+      border-radius: 30px 30px 0 0;
+      margin-top: 20px;
+      min-height: 60vh;
+      box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
+      padding: 50px 20px;
+    }
 
-.answer-btn.disabled {
-  cursor: not-allowed;
-  opacity: 0.7;
-}
+    /* Activity Grid */
+    .activities-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
 
-.quiz-score {
-  background: linear-gradient(135deg, #48bb78, #38a169);
-  color: white;
-  padding: 20px;
-  border-radius: 16px;
-  text-align: center;
-  margin-top: 30px;
-  font-size: 1.2rem;
-  font-weight: 600;
-}
+    .activity-card {
+      background: linear-gradient(135deg, #fff, #f8f9fa);
+      border-radius: 25px;
+      padding: 30px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+      border: 3px solid transparent;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+    }
 
-.reset-btn {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 12px;
-  cursor: pointer;
-  font-weight: 600;
-  margin-top: 16px;
-  transition: all 0.3s ease;
-}
+    .activity-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: var(--card-color, #ff6b6b);
+    }
 
-.reset-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
-}
+    .activity-card:hover {
+      transform: translateY(-10px) scale(1.03);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+      border-color: var(--card-color, #ff6b6b);
+    }
 
-.fun-fact {
-  background: linear-gradient(135deg, #e6f3ff, #cce7ff);
-  border-left: 4px solid #3182ce;
-  padding: 16px;
-  border-radius: 8px;
-  margin-top: 16px;
-  font-style: italic;
-  color: #2c5282;
-}
+    .activity-card.quiz { --card-color: #ff6b6b; }
+    .activity-card.match { --card-color: #4ecdc4; }
+    .activity-card.explore { --card-color: #45b7d1; }
+    .activity-card.learn { --card-color: #96ceb4; }
 
-.interactive-hint {
-  background: #fff5cd;
-  border: 1px solid #f6e05e;
-  border-radius: 8px;
-  padding: 12px;
-  margin-top: 12px;
-  font-size: 0.9rem;
-  color: #744210;
-}
+    .activity-icon {
+      font-size: 4rem;
+      margin-bottom: 20px;
+      animation: wiggle 3s ease-in-out infinite;
+    }
 
-@media (max-width: 768px) {
-  .quiz-container {
-    padding: 15px;
-  }
-  
-  .question-text {
-    font-size: 1.1rem;
-  }
-  
-  .answer-btn {
-    padding: 14px 16px;
-  }
-}
-</style>
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(5deg); }
+      75% { transform: rotate(-5deg); }
+    }
 
-<!-- Add this to your view tabs section -->
-<div class="view-tab" data-view="quiz" onclick="switchView('quiz')">
-  <span>🎯</span> Kids Quiz
-</div>
+    .activity-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 15px;
+    }
 
-<!-- Add this new view container after your existing views -->
-<div class="visualization-container" id="view-quiz" style="display: none;">
-  <div class="viz-header">
-    <h3 class="viz-title">Interactive Lake Quiz for Students</h3>
-    <div class="threejs-controls">
-      <button class="control-btn" onclick="resetAllQuizzes()">🔄 Reset All</button>
-    </div>
-  </div>
-  <div class="viz-content">
-    <div class="quiz-container">
-      
-      <!-- Age Group Selector -->
-      <div class="age-selector">
-        <button class="age-btn active" onclick="switchAgeGroup('elementary')">
-          🏫 Elementary (K-5)
-        </button>
-        <button class="age-btn" onclick="switchAgeGroup('middle')">
-          📚 Middle School (6-8)
-        </button>
-        <button class="age-btn" onclick="switchAgeGroup('high')">
-          🎓 High School (9-12)
-        </button>
-      </div>
+    .activity-description {
+      font-size: 1.1rem;
+      color: #666;
+      margin-bottom: 25px;
+      line-height: 1.5;
+    }
 
-      <!-- Elementary Quiz -->
-      <div class="quiz-section active" id="elementary-quiz">
-        <div class="question-card">
-          <div class="question-number">Question 1</div>
-          <div class="question-text">🏞️ Which lake in our study is the deepest?</div>
-          <div class="answer-options">
-            <button class="answer-btn" onclick="answerQuestion(this, false)">
-              🐟 Fish Lake (15.2m deep)
-            </button>
-            <button class="answer-btn" onclick="answerQuestion(this, false)">
-              🌊 McFee Lake (4.2m deep)
-            </button>
-            <button class="answer-btn" onclick="answerQuestion(this, true)">
-              🏔️ Taits Lake (18m deep)
-            </button>
-          </div>
-          <div class="fun-fact" style="display: none;">
-            🎉 Correct! Taits Lake is our deepest lake at 18 meters. That's about as tall as a 6-story building underwater!
-          </div>
-        </div>
+    .activity-button {
+      background: linear-gradient(135deg, var(--card-color, #ff6b6b), rgba(0,0,0,0.1));
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 25px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
 
-        <div class="question-card">
-          <div class="question-number">Question 2</div>
-          <div class="question-text">🌡️ Which water temperature would feel warmest if you touched it?</div>
-          <div class="answer-options">
-            <button class="answer-btn" onclick="answerQuestion(this, false)">
-              ❄️ 4°C (very cold!)
-            </button>
-            <button class="answer-btn" onclick="answerQuestion(this, false)">
-              🧊 8°C (still cold)
-            </button>
-            <button class="answer-btn" onclick="answerQuestion(this, true)">
-              ☀️ 15°C (warmer)
-            </button>
-          </div>
-          <div class="fun-fact" style="display: none;">
-            🎉 Yes! 15°C feels warmest. Deep lake water is usually much colder than surface water!
-          </div>
-        </div>
+    .activity-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
 
-        <div class="question-card">
-          <div class="question-number">Question 3</div>
-          <div class="question-text">🔍 What do scientists use to measure how deep water is?</div>
-          <div class="answer-options">
-            <button class="answer-btn" onclick="answerQuestion(this, false)">
-              📏 A very long ruler
-            </button>
-            <button class="answer-btn" onclick="answerQuestion(this, true)">
-              📡 Sonar (sound waves)
-            </button>
-            <button class="answer-btn" onclick="answerQuestion(this, false)">
-              🌡️ A thermometer
-            </button>
-          </div>
-          <div class="fun-fact" style="display: none;">
-            🎉 Correct! Sonar sends sound waves down to the lake bottom. The time it takes to bounce back tells us the depth!
-          </div>
-        </div>
-      </div>
+    /* Quiz Modal */
+    .quiz-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+    }
 
-      <!-- Middle School Quiz -->
-      <div class="quiz-section" id="middle-quiz">
-        <div class="question-card">
-          <div class="question-number">Question 1</div>
-          <div class="question-text">📊 If Fish Lake's max depth is 15.2m and McFee Lake is 4.2m, how much deeper is Fish Lake?</div>
-          <div class="answer-options">
-            <button class="answer-btn" onclick="answerQuestion(this, false)">
-              📐 10.0 meters
-            </button>
-            <button class="answer-btn" onclick="answerQuestion(this, true)">
-              📐 11.0 meters
-            </button>
-            <button class="answer-btn" onclick="answerQuestion(this, false)">
-              📐 19.4 meters
-            </button>
-          </div>
-          <div class="interactive-hint">
-            💡 Hint: Use the 3D Bathymetry tab to explore both lakes and see the depth difference visually!
-          </div>
-          <div class="fun-fact" style="display: none;">
-            🎉 Correct! 15.2m - 4.2m = 11.0m. Fish Lake is 11 meters deeper than McFee Lake!
-          </div>
-        </div>
+    .quiz-content {
+      background: white;
+      border-radius: 25px;
+      padding: 40px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    }
 
-        <div class="question-card">
-          <div class="question-number">Question 2</div>
-          <div class="question-text">🌡️ What pattern do you see with water temperature as depth increases?</div>
-          <div class="answer-options">
-            <button class="answer-btn" onclick="answerQuestion(this, false)">
-              📈 Temperature gets warmer with depth
-            </button>
-            <button class="answer-btn" onclick="answerQuestion(this, true)">
-              📉 Temperature gets colder with depth
-            </button>
-            <button class="answer-btn" onclick="answerQuestion(this, false)">
-              ➡️ Temperature stays the same
-            </button>
-          </div>
-          <div class="interactive-hint">
-            💡 Check the Temperature Profile tab to see this pattern in our real data!
-          </div>
-          <div class="fun-fact" style="display: none;">
-            🎉 Right! Deeper water is colder because sunlight can't reach down to warm it. This creates thermal layers!
-          </div>
-        </div>
+    .quiz-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
 
-        <div class="question-card">
-          <div class="question-number">Question 3</div>
-          <div class="question-text">🗺️ Why might scientists take more measurements in deeper areas?</div>
-          <div class="answer-options">
-            <button class="answer-btn" onclick="answerQuestion(this, false)">
-              🏊 Because it's easier to swim there
-            </button>
-            <button class="answer-btn" onclick="answerQuestion(this, true)">
-              🐟 Because deep areas have more complex habitats
-            </button>
-            <button class="answer-btn" onclick="answerQuestion(this, false)">
-              ⛵ Because boats work better in deep water
-            </button>
-          </div>
-          <div class="fun-fact" style="display: none;">
-            🎉 Exactly! Deep areas have different temperatures, oxygen levels, and provide unique habitats for different species!
-          </div>
-        </div>
-      </div>
+    .quiz-progress {
+      background: #f0f0f0;
+      border-radius: 20px;
+      height: 10px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
 
-      <!-- High School Quiz -->
-      <div class="quiz-section" id="high-quiz">
-        <div class="question-card">
-          <div class="question-number">Question 1</div>
-          <div class="question-text">📈 Calculate the average maximum depth across all three lakes: Fish (15.2m), McFee (4.2m), Taits (18.0m)</div>
-          <div class="answer-options">
-            <button class="answer-btn" onclick="answerQuestion(this, false)">
-              📊 11.8 meters
-            </button>
-            <button class="answer-btn" onclick="answerQuestion(this, true)">
-              📊 12.5 meters
-            </button>
-            <button class="answer-btn" onclick="answerQuestion(this, false)">
-              📊 13.2 meters
-            </button>
-          </div>
-          <div class="interactive-hint">
-            💡 Use the Lake Comparison chart in the Depth Analysis tab to verify your calculation!
-          </div>
-          <div class="fun-fact" style="display: none;">
-            🎉 Correct! (15.2 + 4.2 + 18.0) ÷ 3 = 12.5m average depth across our study lakes.
-          </div>
-        </div>
+    .quiz-progress-bar {
+      background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+      height: 100%;
+      width: 0%;
+      transition: width 0.5s ease;
+      border-radius: 20px;
+    }
 
-        <div class="question-card">
-          <div class="question-number">Question 2</div>
-          <div class="question-text">🧬 How might thermal stratification affect dissolved oxygen levels in deep lake zones?</div>
-          <div class="answer-options">
-            <button class="answer-btn" onclick="answerQuestion(this, false)">
-              ⬆️ Deep zones always have more oxygen
-            </button>
-            <button class="answer-btn" onclick="answerQuestion(this, true)">
-              ⬇️ Deep zones may have less oxygen due to limited mixing
-            </button>
-            <button class="answer-btn" onclick="answerQuestion(this, false)">
-              ➡️ Temperature doesn't affect oxygen levels
-            </button>
-          </div>
-          <div class="interactive-hint">
-            💡 Explore the 3D model to see temperature layers, then think about how water mixing works!
-          </div>
-          <div class="fun-fact" style="display: none;">
-            🎉 Excellent! Cold, dense water at the bottom doesn't mix well with warm surface water, limiting oxygen replenishment in deep zones.
-          </div>
-        </div>
+    .question-container {
+      margin-bottom: 30px;
+    }
 
-        <div class="question-card">
-          <div class="question-number">Question 3</div>
-          <div class="question-text">🔬 Based on our grid system data, which sampling strategy would be most effective for monitoring fish spawning areas?</div>
-          <div class="answer-options">
-            <button class="answer-btn" onclick="answerQuestion(this, false)">
-              🎯 Only sample the deepest points
-            </button>
-            <button class="answer-btn" onclick="answerQuestion(this, true)">
-              🗺️ Focus on shallow-to-medium depth transition zones
-            </button>
-            <button class="answer-btn" onclick="answerQuestion(this, false)">
-              📍 Sample randomly across all depths
-            </button>
-          </div>
-          <div class="interactive-hint">
-            💡 Check the Spatial Distribution tab to see where different depth zones are located!
-          </div>
-          <div class="fun-fact" style="display: none;">
-            🎉 Perfect! Many fish species spawn in transition zones where they can access both shallow warming areas and deeper refuges.
-          </div>
-        </div>
-      </div>
+    .question-text {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 25px;
+      text-align: center;
+    }
 
-      <!-- Quiz Score Display -->
-      <div class="quiz-score" id="quiz-score" style="display: none;">
-        <div id="score-text">Great job! You scored 0/0</div>
-        <button class="reset-btn" onclick="resetCurrentQuiz()">Try Again</button>
-      </div>
+    .question-image {
+      width: 100%;
+      max-width: 300px;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 15px;
+      margin: 20px auto;
+      display: block;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
 
-    </div>
-  </div>
-</div>
+    .answers-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
 
-<script>
-// Quiz functionality
-let currentAge = 'elementary';
-let quizScores = {
-  elementary: { correct: 0, total: 3 },
-  middle: { correct: 0, total: 3 },
-  high: { correct: 0, total: 3 }
-};
+    .answer-button {
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      border: 2px solid #dee2e6;
+      border-radius: 15px;
+      padding: 20px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: #333;
+    }
 
-function switchAgeGroup(age) {
-  // Update active button
-  document.querySelectorAll('.age-btn').forEach(btn => btn.classList.remove('active'));
-  event.target.classList.add('active');
-  
-  // Hide all quiz sections
-  document.querySelectorAll('.quiz-section').forEach(section => {
-    section.classList.remove('active');
-  });
-  
-  // Show selected age group
-  document.getElementById(age + '-quiz').classList.add('active');
-  currentAge = age;
-  
-  // Hide score if showing
-  document.getElementById('quiz-score').style.display = 'none';
-}
+    .answer-button:hover {
+      background: linear-gradient(135deg, #e9ecef, #dee2e6);
+      transform: translateY(-2px);
+    }
 
-function answerQuestion(button, isCorrect) {
-  const questionCard = button.closest('.question-card');
-  const allButtons = questionCard.querySelectorAll('.answer-btn');
-  const funFact = questionCard.querySelector('.fun-fact');
-  
-  // Disable all buttons
-  allButtons.forEach(btn => {
-    btn.classList.add('disabled');
-    btn.onclick = null;
-  });
-  
-  // Mark correct/incorrect
-  if (isCorrect) {
-    button.classList.add('correct');
-    quizScores[currentAge].correct++;
-  } else {
-    button.classList.add('incorrect');
-    // Highlight the correct answer
-    allButtons.forEach(btn => {
-      if (btn.onclick && btn.onclick.toString().includes('true')) {
-        btn.classList.add('correct');
+    .answer-button.correct {
+      background: linear-gradient(135deg, #d4edda, #c3e6cb);
+      border-color: #28a745;
+      color: #155724;
+    }
+
+    .answer-button.incorrect {
+      background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+      border-color: #dc3545;
+      color: #721c24;
+    }
+
+    .quiz-result {
+      text-align: center;
+      padding: 30px;
+      display: none;
+    }
+
+    .result-emoji {
+      font-size: 5rem;
+      margin-bottom: 20px;
+      animation: celebration 1s ease-in-out;
+    }
+
+    @keyframes celebration {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2) rotate(10deg); }
+    }
+
+    .close-quiz {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      background: none;
+      border: none;
+      font-size: 2rem;
+      cursor: pointer;
+      color: #999;
+      transition: color 0.3s ease;
+    }
+
+    .close-quiz:hover {
+      color: #ff6b6b;
+    }
+
+    /* Achievement Badges */
+    .achievement-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 1000;
+    }
+
+    .achievement-badge {
+      background: linear-gradient(135deg, #ffd700, #ffed4e);
+      border: 3px solid #fff;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      animation: achievementPop 0.5s ease-out;
+    }
+
+    @keyframes achievementPop {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .hero {
+        padding: 60px 20px 30px;
       }
-    });
-  }
-  
-  // Show fun fact
-  if (funFact) {
-    funFact.style.display = 'block';
-  }
-  
-  // Check if quiz is complete
-  setTimeout(() => {
-    checkQuizComplete();
-  }, 1000);
-}
 
-function checkQuizComplete() {
-  const currentQuiz = document.getElementById(currentAge + '-quiz');
-  const answeredQuestions = currentQuiz.querySelectorAll('.question-card .answer-btn.disabled').length;
-  const totalQuestions = quizScores[currentAge].total;
-  
-  if (answeredQuestions >= totalQuestions) {
-    showQuizScore();
-  }
-}
+      .activities-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
 
-function showQuizScore() {
-  const score = quizScores[currentAge];
-  const percentage = Math.round((score.correct / score.total) * 100);
-  const scoreDisplay = document.getElementById('quiz-score');
-  const scoreText = document.getElementById('score-text');
-  
-  let message = '';
-  if (percentage >= 90) {
-    message = `🌟 Outstanding! You scored ${score.correct}/${score.total} (${percentage}%)! You're a lake science expert!`;
-  } else if (percentage >= 70) {
-    message = `🎉 Great job! You scored ${score.correct}/${score.total} (${percentage}%)! You're learning well!`;
-  } else if (percentage >= 50) {
-    message = `👍 Good effort! You scored ${score.correct}/${score.total} (${percentage}%)! Try exploring the dashboard more!`;
-  } else {
-    message = `💪 Keep trying! You scored ${score.correct}/${score.total} (${percentage}%)! Use the interactive tabs to learn more!`;
-  }
-  
-  scoreText.textContent = message;
-  scoreDisplay.style.display = 'block';
-  
-  // Scroll to score
-  scoreDisplay.scrollIntoView({ behavior: 'smooth' });
-}
+      .quiz-content {
+        padding: 25px;
+        margin: 20px;
+      }
 
-function resetCurrentQuiz() {
-  const currentQuiz = document.getElementById(currentAge + '-quiz');
-  
-  // Reset all buttons
-  currentQuiz.querySelectorAll('.answer-btn').forEach(btn => {
-    btn.classList.remove('correct', 'incorrect', 'disabled');
-    btn.onclick = function() {
-      const isCorrect = this.getAttribute('onclick').includes('true');
-      answerQuestion(this, isCorrect);
+      .answers-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .back-to-home,
+      .score-display {
+        position: relative;
+        top: auto;
+        left: auto;
+        right: auto;
+        margin: 10px;
+        display: inline-flex;
+      }
+    }
+
+    /* Fun Loading Animation */
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 10px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Back to Home Button -->
+  <a href="homepage.html" class="back-to-home">
+    <i class="fas fa-arrow-left"></i>
+    Back to Home
+  </a>
+
+  <!-- Score Display -->
+  <div class="score-display">
+    🏆 Score: <span id="totalScore">0</span>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>🌈 Kids Environmental Explorer! 🌱</h1>
+      <p>Learn about nature through fun games and quizzes!</p>
+    </div>
+  </section>
+
+  <!-- Main Container -->
+  <div class="container">
+    <div class="activities-grid">
+      <!-- Nature Quiz -->
+      <div class="activity-card quiz" onclick="startQuiz('nature')">
+        <div class="activity-icon">🌿</div>
+        <h3 class="activity-title">Nature Quiz</h3>
+        <p class="activity-description">Test your knowledge about plants, animals, and ecosystems with fun questions!</p>
+        <button class="activity-button">
+          <i class="fas fa-question-circle"></i>
+          Start Quiz
+        </button>
+      </div>
+
+      <!-- Animal Matching Game -->
+      <div class="activity-card match" onclick="startQuiz('animals')">
+        <div class="activity-icon">🐾</div>
+        <h3 class="activity-title">Animal Friends</h3>
+        <p class="activity-description">Learn about different animals and where they live in our environment!</p>
+        <button class="activity-button">
+          <i class="fas fa-paw"></i>
+          Meet Animals
+        </button>
+      </div>
+
+      <!-- Water World Quiz -->
+      <div class="activity-card explore" onclick="startQuiz('water')">
+        <div class="activity-icon">💧</div>
+        <h3 class="activity-title">Water World</h3>
+        <p class="activity-description">Dive into questions about lakes, rivers, and the amazing world of water!</p>
+        <button class="activity-button">
+          <i class="fas fa-tint"></i>
+          Explore Water
+        </button>
+      </div>
+
+      <!-- Habitat Explorer -->
+      <div class="activity-card learn" onclick="startQuiz('habitat')">
+        <div class="activity-icon">🏞️</div>
+        <h3 class="activity-title">Habitat Heroes</h3>
+        <p class="activity-description">Discover different habitats and learn which animals call them home!</p>
+        <button class="activity-button">
+          <i class="fas fa-tree"></i>
+          Discover Habitats
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quiz Modal -->
+  <div class="quiz-modal" id="quizModal">
+    <div class="quiz-content">
+      <button class="close-quiz" onclick="closeQuiz()">×</button>
+      
+      <div class="quiz-header">
+        <h2 id="quizTitle">🌿 Nature Quiz</h2>
+        <div class="quiz-progress">
+          <div class="quiz-progress-bar" id="progressBar"></div>
+        </div>
+        <p>Question <span id="currentQuestion">1</span> of <span id="totalQuestions">5</span></p>
+      </div>
+
+      <div class="question-container" id="questionContainer">
+        <!-- Question content will be inserted here -->
+      </div>
+
+      <div class="quiz-result" id="quizResult">
+        <div class="result-emoji" id="resultEmoji">🎉</div>
+        <h3 id="resultTitle">Amazing Work!</h3>
+        <p id="resultMessage">You scored 4 out of 5!</p>
+        <button class="activity-button" onclick="closeQuiz()" style="margin-top: 20px;">
+          Try Another Quiz!
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Achievement Container -->
+  <div class="achievement-container" id="achievementContainer"></div>
+
+  <script>
+    // Game State
+    let currentQuizType = '';
+    let currentQuestionIndex = 0;
+    let currentQuestions = [];
+    let score = 0;
+    let totalScore = parseInt(localStorage.getItem('kidsQuizScore')) || 0;
+    let achievements = JSON.parse(localStorage.getItem('kidsAchievements')) || [];
+
+    // Update score display
+    document.getElementById('totalScore').textContent = totalScore;
+
+    // Quiz Data
+    const quizData = {
+      nature: {
+        title: '🌿 Nature Quiz',
+        questions: [
+          {
+            question: "What do plants need to make their own food?",
+            image: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=300&h=200&fit=crop&crop=center",
+            answers: ["Water only", "Sunlight, water, and air", "Just soil", "Only sunlight"],
+            correct: 1,
+            explanation: "Plants use sunlight, water, and carbon dioxide from air to make food through photosynthesis!"
+          },
+          {
+            question: "Which of these animals is a herbivore (only eats plants)?",
+            image: "https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?w=300&h=200&fit=crop&crop=center",
+            answers: ["Lion", "Rabbit", "Eagle", "Shark"],
+            correct: 1,
+            explanation: "Rabbits are herbivores - they only eat plants like grass, carrots, and lettuce!"
+          },
+          {
+            question: "What happens to leaves in autumn?",
+            image: "https://images.unsplash.com/photo-1507371341162-763b5e419408?w=300&h=200&fit=crop&crop=center",
+            answers: ["They turn colors and fall", "They grow bigger", "They turn into flowers", "Nothing happens"],
+            correct: 0,
+            explanation: "In autumn, leaves change to beautiful colors like red, orange, and yellow before falling down!"
+          },
+          {
+            question: "Where do birds build their homes?",
+            image: "https://images.unsplash.com/photo-1520637836862-4d197d17c86a?w=300&h=200&fit=crop&crop=center",
+            answers: ["Only in trees", "Trees, bushes, and safe places", "Only on the ground", "Only in houses"],
+            correct: 1,
+            explanation: "Birds are smart! They build nests in trees, bushes, cliffs, and even under house roofs!"
+          },
+          {
+            question: "What is recycling?",
+            image: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=300&h=200&fit=crop&crop=center",
+            answers: ["Throwing things away", "Using old things to make new things", "Buying new things", "Burning trash"],
+            correct: 1,
+            explanation: "Recycling means turning old bottles, cans, and paper into new useful things! It helps our planet!"
+          }
+        ]
+      },
+      animals: {
+        title: '🐾 Animal Friends',
+        questions: [
+          {
+            question: "Which animal is known for changing colors?",
+            image: "https://images.unsplash.com/photo-1583512603805-3cc6b41f3edb?w=300&h=200&fit=crop&crop=center",
+            answers: ["Dog", "Chameleon", "Horse", "Fish"],
+            correct: 1,
+            explanation: "Chameleons can change colors to hide from danger or show their feelings!"
+          },
+          {
+            question: "What do bees make?",
+            image: "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=300&h=200&fit=crop&crop=center",
+            answers: ["Milk", "Honey", "Cheese", "Bread"],
+            correct: 1,
+            explanation: "Bees make sweet, golden honey! They also help flowers grow by carrying pollen."
+          },
+          {
+            question: "Which animal sleeps hanging upside down?",
+            image: "https://images.unsplash.com/photo-1544467503-7ad532882176?w=300&h=200&fit=crop&crop=center",
+            answers: ["Monkey", "Bird", "Bat", "Squirrel"],
+            correct: 2,
+            explanation: "Bats sleep hanging upside down in caves, trees, or dark places during the day!"
+          },
+          {
+            question: "What do pandas love to eat?",
+            image: "https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?w=300&h=200&fit=crop&crop=center",
+            answers: ["Fish", "Bamboo", "Meat", "Fruits"],
+            correct: 1,
+            explanation: "Pandas love eating bamboo! They can eat up to 40 pounds of bamboo every day!"
+          },
+          {
+            question: "Which animal is the tallest in the world?",
+            image: "https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=300&h=200&fit=crop&crop=center",
+            answers: ["Elephant", "Giraffe", "Horse", "Bear"],
+            correct: 1,
+            explanation: "Giraffes are the tallest animals! Their long necks help them eat leaves from tall trees."
+          }
+        ]
+      },
+      water: {
+        title: '💧 Water World',
+        questions: [
+          {
+            question: "Where does rain come from?",
+            image: "https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?w=300&h=200&fit=crop&crop=center",
+            answers: ["The ground", "Clouds in the sky", "Trees", "Mountains"],
+            correct: 1,
+            explanation: "Rain comes from clouds! Water evaporates from oceans and lakes, forms clouds, then falls as rain."
+          },
+          {
+            question: "What lives in both water and on land?",
+            image: "https://images.unsplash.com/photo-1459262838948-3e2de6c1ec80?w=300&h=200&fit=crop&crop=center",
+            answers: ["Fish", "Frog", "Bird", "Snake"],
+            correct: 1,
+            explanation: "Frogs are amphibians! Baby frogs (tadpoles) live in water, then grow legs to live on land too."
+          },
+          {
+            question: "What should we do to keep water clean?",
+            image: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=300&h=200&fit=crop&crop=center",
+            answers: ["Throw trash in rivers", "Don't litter near water", "Use lots of soap", "Nothing special"],
+            correct: 1,
+            explanation: "We should never litter near water! Clean water helps fish, plants, and people stay healthy."
+          },
+          {
+            question: "Which animal is the biggest in the ocean?",
+            image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=300&h=200&fit=crop&crop=center",
+            answers: ["Shark", "Blue Whale", "Octopus", "Dolphin"],
+            correct: 1,
+            explanation: "Blue whales are the biggest animals on Earth! They're even bigger than dinosaurs were!"
+          },
+          {
+            question: "What happens when water gets very cold?",
+            image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=200&fit=crop&crop=center",
+            answers: ["It disappears", "It turns to ice", "It gets hot", "It changes color"],
+            correct: 1,
+            explanation: "When water gets very cold (32°F or 0°C), it freezes and becomes ice!"
+          }
+        ]
+      },
+      habitat: {
+        title: '🏞️ Habitat Heroes',
+        questions: [
+          {
+            question: "Where do polar bears live?",
+            image: "https://images.unsplash.com/photo-1589656966895-2f33e7653819?w=300&h=200&fit=crop&crop=center",
+            answers: ["Desert", "Arctic (very cold places)", "Jungle", "Grassland"],
+            correct: 1,
+            explanation: "Polar bears live in the Arctic where it's very cold and snowy. Their thick fur keeps them warm!"
+          },
+          {
+            question: "What is a desert like?",
+            image: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=300&h=200&fit=crop&crop=center",
+            answers: ["Very wet", "Very hot and dry", "Always snowing", "Full of trees"],
+            correct: 1,
+            explanation: "Deserts are very hot during the day and get very little rain. Special plants like cacti live there!"
+          },
+          {
+            question: "Which animals live in the forest?",
+            image: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=300&h=200&fit=crop&crop=center",
+            answers: ["Only bears", "Bears, deer, birds, and many others", "Only birds", "No animals"],
+            correct: 1,
+            explanation: "Forests are home to many animals! Bears, deer, squirrels, birds, and insects all live in forests."
+          },
+          {
+            question: "What makes a good home for fish?",
+            image: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=300&h=200&fit=crop&crop=center",
+            answers: ["Dirty water", "Clean water with food", "No water", "Very hot water"],
+            correct: 1,
+            explanation: "Fish need clean water with oxygen and food like plants and smaller fish to be healthy!"
+          },
+          {
+            question: "Why do some animals migrate (move to different places)?",
+            image: "https://images.unsplash.com/photo-1444927714506-8492d94b5ba0?w=300&h=200&fit=crop&crop=center",
+            answers: ["They get bored", "To find food and warm weather", "They like to travel", "To make friends"],
+            correct: 1,
+            explanation: "Animals migrate to find food, warmer weather, or safe places to have babies. Birds fly south for winter!"
+          }
+        ]
+      }
     };
-  });
-  
-  // Hide fun facts
-  currentQuiz.querySelectorAll('.fun-fact').forEach(fact => {
-    fact.style.display = 'none';
-  });
-  
-  // Reset score
-  quizScores[currentAge].correct = 0;
-  document.getElementById('quiz-score').style.display = 'none';
-}
 
-function resetAllQuizzes() {
-  ['elementary', 'middle', 'high'].forEach(age => {
-    const quiz = document.getElementById(age + '-quiz');
-    
-    quiz.querySelectorAll('.answer-btn').forEach(btn => {
-      btn.classList.remove('correct', 'incorrect', 'disabled');
-      const isCorrect = btn.getAttribute('onclick').includes('true');
-      btn.onclick = function() { answerQuestion(this, isCorrect); };
+    // Start Quiz Function
+    function startQuiz(type) {
+      currentQuizType = type;
+      currentQuestions = quizData[type].questions;
+      currentQuestionIndex = 0;
+      score = 0;
+      
+      document.getElementById('quizTitle').textContent = quizData[type].title;
+      document.getElementById('totalQuestions').textContent = currentQuestions.length;
+      document.getElementById('quizModal').style.display = 'flex';
+      document.getElementById('quizResult').style.display = 'none';
+      
+      showQuestion();
+    }
+
+    // Show Question
+    function showQuestion() {
+      const question = currentQuestions[currentQuestionIndex];
+      const container = document.getElementById('questionContainer');
+      
+      document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+      updateProgressBar();
+      
+      container.innerHTML = `
+        <div class="question-text">${question.question}</div>
+        <img src="${question.image}" alt="Question image" class="question-image" onerror="this.style.display='none'">
+        <div class="answers-grid">
+          ${question.answers.map((answer, index) => 
+            `<button class="answer-button" onclick="selectAnswer(${index})">${answer}</button>`
+          ).join('')}
+        </div>
+      `;
+    }
+
+    // Select Answer
+    function selectAnswer(selectedIndex) {
+      const question = currentQuestions[currentQuestionIndex];
+      const buttons = document.querySelectorAll('.answer-button');
+      
+      // Disable all buttons
+      buttons.forEach(button => button.style.pointerEvents = 'none');
+      
+      // Show correct/incorrect answers
+      buttons.forEach((button, index) => {
+        if (index === question.correct) {
+          button.classList.add('correct');
+        } else if (index === selectedIndex && index !== question.correct) {
+          button.classList.add('incorrect');
+        }
+      });
+      
+      // Update score
+      if (selectedIndex === question.correct) {
+        score++;
+        showPositiveFeedback();
+      } else {
+        showEncouragingFeedback();
+      }
+      
+      // Show explanation
+      setTimeout(() => {
+        const container = document.getElementById('questionContainer');
+        container.innerHTML += `
+          <div style="background: #e8f5e8; border-radius: 15px; padding: 20px; margin-top: 20px; text-align: center;">
+            <h4 style="color: #2d5a2d; margin-bottom: 10px;">🌟 Did You Know?</h4>
+            <p style="color: #2d5a2d; font-size: 1.1rem;">${question.explanation}</p>
+          </div>
+          <button class="activity-button" onclick="nextQuestion()" style="margin-top: 20px; background: linear-gradient(135deg, #4ecdc4, #45b7d1);">
+            ${currentQuestionIndex < currentQuestions.length - 1 ? 'Next Question! 🚀' : 'See Results! 🎉'}
+          </button>
+        `;
+      }, 1500);
+    }
+
+    // Next Question
+    function nextQuestion() {
+      currentQuestionIndex++;
+      
+      if (currentQuestionIndex < currentQuestions.length) {
+        showQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    // Show Results
+    function showResults() {
+      const resultContainer = document.getElementById('quizResult');
+      const resultEmoji = document.getElementById('resultEmoji');
+      const resultTitle = document.getElementById('resultTitle');
+      const resultMessage = document.getElementById('resultMessage');
+      
+      // Update total score
+      totalScore += score;
+      localStorage.setItem('kidsQuizScore', totalScore);
+      document.getElementById('totalScore').textContent = totalScore;
+      
+      // Hide question container
+      document.getElementById('questionContainer').style.display = 'none';
+      
+      // Show results
+      resultContainer.style.display = 'block';
+      
+      // Determine result message
+      const percentage = (score / currentQuestions.length) * 100;
+      
+      if (percentage >= 80) {
+        resultEmoji.textContent = '🌟';
+        resultTitle.textContent = 'Outstanding Explorer!';
+        resultMessage.innerHTML = `Wow! You scored ${score} out of ${currentQuestions.length}!<br>You're a true nature expert! 🏆`;
+        addAchievement('🌟', 'Nature Expert');
+      } else if (percentage >= 60) {
+        resultEmoji.textContent = '🎉';
+        resultTitle.textContent = 'Great Job!';
+        resultMessage.innerHTML = `Awesome! You scored ${score} out of ${currentQuestions.length}!<br>You're learning so much! 🌱`;
+        addAchievement('🎉', 'Great Learner');
+      } else {
+        resultEmoji.textContent = '🌈';
+        resultTitle.textContent = 'Keep Exploring!';
+        resultMessage.innerHTML = `You scored ${score} out of ${currentQuestions.length}!<br>Every question helps you learn! Keep going! 💪`;
+        addAchievement('🌈', 'Brave Explorer');
+      }
+      
+      // Add fun facts
+      const funFacts = [
+        "🐝 A bee visits about 5,000 flowers to make one teaspoon of honey!",
+        "🌳 One tree can produce enough oxygen for two people for a whole year!",
+        "🐧 Penguins have a special gland that filters salt water so they can drink it!",
+        "🦋 Butterflies taste with their feet!",
+        "🌙 Some trees can live for over 1,000 years!"
+      ];
+      
+      const randomFact = funFacts[Math.floor(Math.random() * funFacts.length)];
+      resultMessage.innerHTML += `<br><br><div style="background: #fff3cd; border-radius: 10px; padding: 15px; margin-top: 15px;"><strong>Fun Fact:</strong><br>${randomFact}</div>`;
+      
+      updateProgressBar(100);
+    }
+
+    // Close Quiz
+    function closeQuiz() {
+      document.getElementById('quizModal').style.display = 'none';
+      document.getElementById('questionContainer').style.display = 'block';
+      document.getElementById('quizResult').style.display = 'none';
+    }
+
+    // Update Progress Bar
+    function updateProgressBar(customPercent = null) {
+      const percent = customPercent || ((currentQuestionIndex + 1) / currentQuestions.length) * 100;
+      document.getElementById('progressBar').style.width = percent + '%';
+    }
+
+    // Show Positive Feedback
+    function showPositiveFeedback() {
+      const feedbacks = ['🎉 Correct!', '⭐ Amazing!', '🌟 Brilliant!', '🏆 Perfect!', '💫 Fantastic!'];
+      showTemporaryMessage(feedbacks[Math.floor(Math.random() * feedbacks.length)], '#4ecdc4');
+    }
+
+    // Show Encouraging Feedback
+    function showEncouragingFeedback() {
+      const feedbacks = ['🌈 Good try!', '💪 Keep learning!', '🌱 You\'re growing!', '🚀 Almost there!', '⭐ Great effort!'];
+      showTemporaryMessage(feedbacks[Math.floor(Math.random() * feedbacks.length)], '#ff6b6b');
+    }
+
+    // Show Temporary Message
+    function showTemporaryMessage(message, color) {
+      const messageDiv = document.createElement('div');
+      messageDiv.innerHTML = message;
+      messageDiv.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: ${color};
+        color: white;
+        padding: 20px 40px;
+        border-radius: 25px;
+        font-size: 1.5rem;
+        font-weight: 700;
+        z-index: 20000;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        animation: messagePopIn 0.5s ease-out;
+      `;
+      
+      document.body.appendChild(messageDiv);
+      
+      setTimeout(() => {
+        messageDiv.style.animation = 'messagePopOut 0.3s ease-in forwards';
+        setTimeout(() => document.body.removeChild(messageDiv), 300);
+      }, 1500);
+    }
+
+    // Add Achievement
+    function addAchievement(emoji, title) {
+      if (!achievements.includes(title)) {
+        achievements.push(title);
+        localStorage.setItem('kidsAchievements', JSON.stringify(achievements));
+        
+        const badge = document.createElement('div');
+        badge.className = 'achievement-badge';
+        badge.innerHTML = emoji;
+        badge.title = title;
+        
+        document.getElementById('achievementContainer').appendChild(badge);
+        
+        setTimeout(() => {
+          showTemporaryMessage(`🏆 New Achievement: ${title}!`, '#ffd700');
+        }, 500);
+      }
+    }
+
+    // Load Existing Achievements
+    function loadAchievements() {
+      const container = document.getElementById('achievementContainer');
+      const achievementEmojis = {
+        'Nature Expert': '🌟',
+        'Great Learner': '🎉',
+        'Brave Explorer': '🌈',
+        'Quiz Master': '🏆',
+        'Animal Friend': '🐾',
+        'Water Protector': '💧',
+        'Habitat Hero': '🏞️'
+      };
+      
+      achievements.forEach(achievement => {
+        const badge = document.createElement('div');
+        badge.className = 'achievement-badge';
+        badge.innerHTML = achievementEmojis[achievement] || '⭐';
+        badge.title = achievement;
+        container.appendChild(badge);
+      });
+    }
+
+    // Add CSS animations
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes messagePopIn {
+        0% { transform: translate(-50%, -50%) scale(0); }
+        50% { transform: translate(-50%, -50%) scale(1.1); }
+        100% { transform: translate(-50%, -50%) scale(1); }
+      }
+      
+      @keyframes messagePopOut {
+        0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        100% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+      loadAchievements();
+      
+      // Add some fun interactions
+      document.querySelectorAll('.activity-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+          const icon = this.querySelector('.activity-icon');
+          icon.style.transform = 'scale(1.2) rotate(10deg)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+          const icon = this.querySelector('.activity-icon');
+          icon.style.transform = 'scale(1) rotate(0deg)';
+        });
+      });
+      
+      // Add keyboard support
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          closeQuiz();
+        }
+      });
     });
-    
-    quiz.querySelectorAll('.fun-fact').forEach(fact => {
-      fact.style.display = 'none';
-    });
-    
-    quizScores[age].correct = 0;
-  });
-  
-  document.getElementById('quiz-score').style.display = 'none';
-}
-</script>
+
+    // Fun Sound Effects (Optional - can be enabled)
+    function playSound(type) {
+      // Web Audio API sounds can be added here
+      // For now, we'll use visual feedback
+      console.log(`Playing ${type} sound effect`);
+    }
+
+    // Additional Fun Features
+    function showRandomFact() {
+      const facts = [
+        "🌍 Earth is the only planet we know that has life!",
+        "🌊 Oceans cover about 71% of Earth's surface!",
+        "🌳 Trees communicate with each other through their roots!",
+        "🐘 Elephants can remember friends after decades apart!",
+        "🌙 The moon controls ocean tides with its gravity!"
+      ];
+      
+      const randomFact = facts[Math.floor(Math.random() * facts.length)];
+      showTemporaryMessage(randomFact, '#96ceb4');
+    }
+
+    // Show random fact every 2 minutes
+    setInterval(showRandomFact, 120000);
+  </script>
+</body>
+</html>
