@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IESF Environmental Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <script>
+  function navigateTo(url) {
+    window.location.href = url;
+  }
+  </script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 80px 20px 60px;
+      text-align: center;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.1);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    /* Logo Styles */
+    .logo-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+
+    .hero-logo {
+      width: 120px;
+      height: 120px;
+      margin-right: 20px;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+    }
+
+    .hero h1 {
+      font-size: clamp(3rem, 6vw, 5rem);
+      font-weight: 800;
+      margin-bottom: 20px;
+      background: linear-gradient(45deg, #fff, #f0f0f0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .hero p {
+      font-size: 1.3rem;
+      margin-bottom: 40px;
+      opacity: 0.95;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 24px;
+      max-width: 800px;
+      margin: 40px auto 0;
+    }
+
+    .stat-card {
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(15px);
+      border-radius: 20px;
+      padding: 30px 20px;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.2);
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      background: rgba(255,255,255,0.2);
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+
+    .stat-label {
+      font-size: 1rem;
+      opacity: 0.9;
+      font-weight: 500;
+    }
+
+    /* Main Content */
+    .main-content {
+      background: white;
+      border-radius: 30px 30px 0 0;
+      margin-top: 40px;
+      min-height: 60vh;
+      box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
+      position: relative;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 60px 20px;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #2d3748;
+      margin-bottom: 16px;
+    }
+
+    .section-subtitle {
+      font-size: 1.2rem;
+      color: #718096;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Dashboard Cards */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 32px;
+      margin-bottom: 60px;
+    }
+
+    .dashboard-card {
+      background: white;
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+      border: 1px solid #f0f0f0;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dashboard-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: var(--accent-color, #667eea);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+
+    .dashboard-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .dashboard-card:hover {
+      transform: translateY(-12px) scale(1.02);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+    }
+
+    .card-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      margin-bottom: 24px;
+      background: var(--icon-bg, rgba(102, 126, 234, 0.1));
+      color: var(--accent-color, #667eea);
+    }
+
+    .card-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #2d3748;
+      margin-bottom: 12px;
+    }
+
+    .card-description {
+      color: #718096;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+
+    .card-stats {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding: 16px;
+      background: #f8f9fa;
+      border-radius: 12px;
+    }
+
+    .card-stat {
+      text-align: center;
+    }
+
+    .card-stat-number {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--accent-color, #667eea);
+      margin-bottom: 4px;
+    }
+
+    .card-stat-label {
+      font-size: 0.85rem;
+      color: #718096;
+      font-weight: 500;
+    }
+
+    .card-button {
+      background: linear-gradient(135deg, var(--accent-color, #667eea), var(--accent-dark, #5a67d8));
+      color: white;
+      border: none;
+      padding: 14px 24px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .card-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+
+    /* Color variations for different dashboards */
+    .dashboard-card.species {
+      --accent-color: #48bb78;
+      --accent-dark: #38a169;
+      --icon-bg: rgba(72, 187, 120, 0.1);
+    }
+
+    .dashboard-card.habitat {
+      --accent-color: #ed8936;
+      --accent-dark: #dd6b20;
+      --icon-bg: rgba(237, 137, 54, 0.1);
+    }
+
+    .dashboard-card.bathymetry {
+      --accent-color: #4299e1;
+      --accent-dark: #3182ce;
+      --icon-bg: rgba(66, 153, 225, 0.1);
+    }
+
+    .dashboard-card.lake-testing {
+      --accent-color: #9f7aea;
+      --accent-dark: #805ad5;
+      --icon-bg: rgba(159, 122, 234, 0.1);
+    }
+
+    .dashboard-card.kids {
+      --accent-color: #f56565;
+      --accent-dark: #e53e3e;
+      --icon-bg: rgba(245, 101, 101, 0.1);
+    }
+
+    /* Kids Section */
+    .kids-section {
+      background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+      border-radius: 24px;
+      padding: 40px;
+      margin: 60px 0;
+      text-align: center;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kids-section::before {
+      content: '🌟';
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 3rem;
+      opacity: 0.3;
+      animation: twinkle 2s ease-in-out infinite alternate;
+    }
+
+    .kids-section::after {
+      content: '🦋';
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      font-size: 2rem;
+      opacity: 0.3;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes twinkle {
+      0% { opacity: 0.3; }
+      100% { opacity: 0.8; }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .kids-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+
+    .kids-description {
+      font-size: 1.2rem;
+      margin-bottom: 32px;
+      opacity: 0.95;
+    }
+
+    .kids-features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .kids-feature {
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 24px;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .kids-feature-icon {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+    }
+
+    .kids-feature-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .kids-feature-text {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    .kids-button {
+      background: white;
+      color: #ff6b6b;
+      border: none;
+      padding: 16px 32px;
+      border-radius: 25px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .kids-button:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+
+    /* Footer */
+    .footer {
+      background: #2d3748;
+      color: white;
+      padding: 60px 20px 40px;
+      text-align: center;
+    }
+
+    .footer-content {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .footer h3 {
+      font-size: 1.5rem;
+      margin-bottom: 16px;
+    }
+
+    .footer p {
+      margin-bottom: 32px;
+      opacity: 0.9;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+
+    .footer-link {
+      color: #cbd5e0;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .footer-link:hover {
+      color: white;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid #4a5568;
+      padding-top: 24px;
+      opacity: 0.7;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .hero {
+        padding: 60px 20px 40px;
+      }
+
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+
+      .hero p {
+        font-size: 1.1rem;
+      }
+
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+
+      .kids-features {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-links {
+        flex-direction: column;
+        gap: 16px;
+      }
+    }
+
+    /* Loading Animation */
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 8px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Announcement Banner */
+    .announcement {
+      background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+      color: white;
+      padding: 12px 20px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .announcement a {
+      color: white;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <!-- Announcement Banner -->
+  <div class="announcement">
+    🌟 New Interactive Kids Dashboard Coming Soon! Perfect for young environmental explorers 🌟
+  </div>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="logo-container">
+        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxjaXJjbGUgY3g9IjUwIiBjeT0iNTAiIHI9IjUwIiBmaWxsPSJ1cmwoI3BhaW50MF9saW5lYXJfMF8xKSIvPgo8cGF0aCBkPSJNMjAgODBMMzAgNzBMMjAgNjBMMzAgNTBIMjBMMzAgNDBMMjAgMzBMMzAgMjBIMjBWMTBIMzBWMjBINDBWMzBINTBWNDBINjBWNTBINzBWNjBIODBWNzBIOTBWODBIODBWOTBINzBWODBINjBWNzBINTBWNjBINDBWNTBIMzBWNjBIMjBWNzBIMTBWODBIMjBaIiBmaWxsPSIjMkY0RjRGIi8+CjxwYXRoIGQ9Ik0zNSAyNUw0NSAzNUwzNSA0NUw0NSA1NUgzNUw0NSA2NUwzNSA3NUw0NSA4NUgzNVY5NUg0NVY4NUg1NVY3NUg2NVY2NUg3NVY1NUg4NVY0NUg3NVYzNUg2NVYyNUg1NVYxNUg0NVYyNUgzNVoiIGZpbGw9IiMwMDAwMDAiLz4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0icGFpbnQwX2xpbmVhcl8wXzEiIHgxPSI1MCIgeTE9IjAiIHgyPSI1MCIgeTI9IjEwMCIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgo8c3RvcCBzdG9wLWNvbG9yPSIjRkY4QTAwIi8+CjxzdG9wIG9mZnNldD0iMC41IiBzdG9wLWNvbG9yPSIjRkZBNTAwIi8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzMzMzMzMyIvPgo8L2xpbmVhckdyYWRpZW50Pgo8L2RlZnM+Cjwvc3ZnPgo=" alt="Land'escapes Logo" class="hero-logo">
+      </div>
+      <h1>Land'escapes Environmental Dashboard</h1>
+      <p>Explore comprehensive environmental data from Land'escapes research area through interactive visualizations and real-time monitoring systems</p>
+      
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number">128K+</div>
+          <div class="stat-label">Data Points</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">5</div>
+          <div class="stat-label">Dashboards</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">25+</div>
+          <div class="stat-label">Lakes Monitored</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">400+</div>
+          <div class="stat-label">Species Tracked</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Environmental Data Dashboards</h2>
+        <p class="section-subtitle">Choose from our specialized dashboards to explore different aspects of the Land'escapes environmental monitoring program</p>
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- Species Occurrence Dashboard -->
+        <div class="dashboard-card species" onclick="navigateTo('species_occ.html')">
+          <div class="card-icon">
+            <i class="fas fa-binoculars"></i>
+          </div>
+          <h3 class="card-title">Species Observations</h3>
+          <p class="card-description">Explore wildlife sightings, bird counts, and biodiversity data collected throughout the research area using our comprehensive Supabase database.</p>
+          <div class="card-stats">
+            <div class="card-stat">
+              <div class="card-stat-number">400+</div>
+              <div class="card-stat-label">Species</div>
+            </div>
+            <div class="card-stat">
+              <div class="card-stat-number">2K+</div>
+              <div class="card-stat-label">Observations</div>
+            </div>
+            <div class="card-stat">
+              <div class="card-stat-number">8+</div>
+              <div class="card-stat-label">Categories</div>
+            </div>
+          </div>
+          <button class="card-button">
+            <i class="fas fa-search"></i>
+            Explore Species Data
+          </button>
+        </div>
+
+        <!-- Habitat Inventory Dashboard -->
+        <div class="dashboard-card habitat" onclick="navigateTo('habitat.html')">
+          <div class="card-icon">
+            <i class="fas fa-map"></i>
+          </div>
+          <h3 class="card-title">Habitat Inventory</h3>
+          <p class="card-description">Interactive maps showing habitat classifications, ecosystem types, and spatial distribution patterns.</p>
+          <div class="card-stats">
+            <div class="card-stat">
+              <div class="card-stat-number">17K+</div>
+              <div class="card-stat-label">Records</div>
+            </div>
+            <div class="card-stat">
+              <div class="card-stat-number">9</div>
+              <div class="card-stat-label">Habitat Types</div>
+            </div>
+            <div class="card-stat">
+              <div class="card-stat-number">700+</div>
+              <div class="card-stat-label">Grid Cells</div>
+            </div>
+          </div>
+          <button class="card-button">
+            <i class="fas fa-leaf"></i>
+            View Habitat Maps
+          </button>
+        </div>
+
+        <!-- Bathymetry Dashboard -->
+        <div class="dashboard-card bathymetry" onclick="navigateTo('index.html')">
+          <div class="card-icon">
+            <i class="fas fa-water"></i>
+          </div>
+          <h3 class="card-title">3D Bathymetry</h3>
+          <p class="card-description">Immersive 3D lake models showing depth profiles, temperature gradients, and underwater topography.</p>
+          <div class="card-stats">
+            <div class="card-stat">
+              <div class="card-stat-number">127K+</div>
+              <div class="card-stat-label">Measurements</div>
+            </div>
+            <div class="card-stat">
+              <div class="card-stat-number">3</div>
+              <div class="card-stat-label">Lake Systems</div>
+            </div>
+            <div class="card-stat">
+              <div class="card-stat-number">18m</div>
+              <div class="card-stat-label">Max Depth</div>
+            </div>
+          </div>
+          <button class="card-button">
+            <i class="fas fa-cube"></i>
+            Launch 3D Models
+          </button>
+        </div>
+
+        <!-- Lake Testing Dashboard -->
+        <div class="dashboard-card lake-testing" onclick="navigateTo('lake_testing.html')">
+          <div class="card-icon">
+            <i class="fas fa-flask"></i>
+          </div>
+          <h3 class="card-title">Water Quality Testing</h3>
+          <p class="card-description">Comprehensive water quality analysis including pH, dissolved oxygen, temperature, and clarity measurements.</p>
+          <div class="card-stats">
+            <div class="card-stat">
+              <div class="card-stat-number">838</div>
+              <div class="card-stat-label">Tests</div>
+            </div>
+            <div class="card-stat">
+              <div class="card-stat-number">21</div>
+              <div class="card-stat-label">Water Bodies</div>
+            </div>
+            <div class="card-stat">
+              <div class="card-stat-number">4</div>
+              <div class="card-stat-label">Parameters</div>
+            </div>
+          </div>
+          <button class="card-button">
+            <i class="fas fa-chart-line"></i>
+            Analyze Water Quality
+          </button>
+        </div>
+
+        <!-- Kids Dashboard -->
+        <div class="dashboard-card kids" onclick="navigateTo('kids_dashboard.html')">
+          <div class="card-icon">
+            <i class="fas fa-child"></i>
+          </div>
+          <h3 class="card-title">Kids Explorer Dashboard</h3>
+          <p class="card-description">Fun, interactive environmental learning with games, quizzes, and colorful visualizations designed for young explorers.</p>
+          <div class="card-stats">
+            <div class="card-stat">
+              <div class="card-stat-number">10+</div>
+              <div class="card-stat-label">Games</div>
+            </div>
+            <div class="card-stat">
+              <div class="card-stat-number">5+</div>
+              <div class="card-stat-label">Quizzes</div>
+            </div>
+            <div class="card-stat">
+              <div class="card-stat-number">Fun!</div>
+              <div class="card-stat-label">Learning</div>
+            </div>
+          </div>
+          <button class="card-button">
+            <i class="fas fa-gamepad"></i>
+            Start Exploring!
+          </button>
+        </div>
+      </div>
+
+      <!-- Remove the separate kids section since it's now a dashboard card -->
+      <!-- Kids Dashboard Section -->
+      <!-- <div class="kids-section">
+        <h2 class="kids-title">🌈 Kids Environmental Explorer</h2>
+        <p class="kids-description">A fun, interactive dashboard designed specially for young environmental scientists and nature enthusiasts!</p>
+        
+        <div class="kids-features">
+          <div class="kids-feature">
+            <div class="kids-feature-icon">🎮</div>
+            <div class="kids-feature-title">Interactive Games

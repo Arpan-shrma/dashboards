@@ -1,0 +1,553 @@
+<!-- Add this CSS to your existing styles -->
+<style>
+.quiz-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.age-selector {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 30px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.age-btn {
+  padding: 12px 24px;
+  border: 2px solid #3182ce;
+  border-radius: 25px;
+  background: white;
+  color: #3182ce;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.age-btn.active {
+  background: #3182ce;
+  color: white;
+}
+
+.age-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(49, 130, 206, 0.3);
+}
+
+.quiz-section {
+  display: none;
+}
+
+.quiz-section.active {
+  display: block;
+}
+
+.question-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-left: 4px solid #667eea;
+}
+
+.question-number {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+
+.question-text {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.answer-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.answer-btn {
+  padding: 16px 20px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  background: white;
+  color: #4a5568;
+  cursor: pointer;
+  font-size: 1rem;
+  text-align: left;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.answer-btn:hover {
+  border-color: #3182ce;
+  background: #f7fafc;
+  transform: translateX(5px);
+}
+
+.answer-btn.correct {
+  background: #c6f6d5;
+  border-color: #68d391;
+  color: #2f855a;
+}
+
+.answer-btn.incorrect {
+  background: #fed7d7;
+  border-color: #feb2b2;
+  color: #c53030;
+}
+
+.answer-btn.disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.quiz-score {
+  background: linear-gradient(135deg, #48bb78, #38a169);
+  color: white;
+  padding: 20px;
+  border-radius: 16px;
+  text-align: center;
+  margin-top: 30px;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.reset-btn {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 16px;
+  transition: all 0.3s ease;
+}
+
+.reset-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+.fun-fact {
+  background: linear-gradient(135deg, #e6f3ff, #cce7ff);
+  border-left: 4px solid #3182ce;
+  padding: 16px;
+  border-radius: 8px;
+  margin-top: 16px;
+  font-style: italic;
+  color: #2c5282;
+}
+
+.interactive-hint {
+  background: #fff5cd;
+  border: 1px solid #f6e05e;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 12px;
+  font-size: 0.9rem;
+  color: #744210;
+}
+
+@media (max-width: 768px) {
+  .quiz-container {
+    padding: 15px;
+  }
+  
+  .question-text {
+    font-size: 1.1rem;
+  }
+  
+  .answer-btn {
+    padding: 14px 16px;
+  }
+}
+</style>
+
+<!-- Add this to your view tabs section -->
+<div class="view-tab" data-view="quiz" onclick="switchView('quiz')">
+  <span>🎯</span> Kids Quiz
+</div>
+
+<!-- Add this new view container after your existing views -->
+<div class="visualization-container" id="view-quiz" style="display: none;">
+  <div class="viz-header">
+    <h3 class="viz-title">Interactive Lake Quiz for Students</h3>
+    <div class="threejs-controls">
+      <button class="control-btn" onclick="resetAllQuizzes()">🔄 Reset All</button>
+    </div>
+  </div>
+  <div class="viz-content">
+    <div class="quiz-container">
+      
+      <!-- Age Group Selector -->
+      <div class="age-selector">
+        <button class="age-btn active" onclick="switchAgeGroup('elementary')">
+          🏫 Elementary (K-5)
+        </button>
+        <button class="age-btn" onclick="switchAgeGroup('middle')">
+          📚 Middle School (6-8)
+        </button>
+        <button class="age-btn" onclick="switchAgeGroup('high')">
+          🎓 High School (9-12)
+        </button>
+      </div>
+
+      <!-- Elementary Quiz -->
+      <div class="quiz-section active" id="elementary-quiz">
+        <div class="question-card">
+          <div class="question-number">Question 1</div>
+          <div class="question-text">🏞️ Which lake in our study is the deepest?</div>
+          <div class="answer-options">
+            <button class="answer-btn" onclick="answerQuestion(this, false)">
+              🐟 Fish Lake (15.2m deep)
+            </button>
+            <button class="answer-btn" onclick="answerQuestion(this, false)">
+              🌊 McFee Lake (4.2m deep)
+            </button>
+            <button class="answer-btn" onclick="answerQuestion(this, true)">
+              🏔️ Taits Lake (18m deep)
+            </button>
+          </div>
+          <div class="fun-fact" style="display: none;">
+            🎉 Correct! Taits Lake is our deepest lake at 18 meters. That's about as tall as a 6-story building underwater!
+          </div>
+        </div>
+
+        <div class="question-card">
+          <div class="question-number">Question 2</div>
+          <div class="question-text">🌡️ Which water temperature would feel warmest if you touched it?</div>
+          <div class="answer-options">
+            <button class="answer-btn" onclick="answerQuestion(this, false)">
+              ❄️ 4°C (very cold!)
+            </button>
+            <button class="answer-btn" onclick="answerQuestion(this, false)">
+              🧊 8°C (still cold)
+            </button>
+            <button class="answer-btn" onclick="answerQuestion(this, true)">
+              ☀️ 15°C (warmer)
+            </button>
+          </div>
+          <div class="fun-fact" style="display: none;">
+            🎉 Yes! 15°C feels warmest. Deep lake water is usually much colder than surface water!
+          </div>
+        </div>
+
+        <div class="question-card">
+          <div class="question-number">Question 3</div>
+          <div class="question-text">🔍 What do scientists use to measure how deep water is?</div>
+          <div class="answer-options">
+            <button class="answer-btn" onclick="answerQuestion(this, false)">
+              📏 A very long ruler
+            </button>
+            <button class="answer-btn" onclick="answerQuestion(this, true)">
+              📡 Sonar (sound waves)
+            </button>
+            <button class="answer-btn" onclick="answerQuestion(this, false)">
+              🌡️ A thermometer
+            </button>
+          </div>
+          <div class="fun-fact" style="display: none;">
+            🎉 Correct! Sonar sends sound waves down to the lake bottom. The time it takes to bounce back tells us the depth!
+          </div>
+        </div>
+      </div>
+
+      <!-- Middle School Quiz -->
+      <div class="quiz-section" id="middle-quiz">
+        <div class="question-card">
+          <div class="question-number">Question 1</div>
+          <div class="question-text">📊 If Fish Lake's max depth is 15.2m and McFee Lake is 4.2m, how much deeper is Fish Lake?</div>
+          <div class="answer-options">
+            <button class="answer-btn" onclick="answerQuestion(this, false)">
+              📐 10.0 meters
+            </button>
+            <button class="answer-btn" onclick="answerQuestion(this, true)">
+              📐 11.0 meters
+            </button>
+            <button class="answer-btn" onclick="answerQuestion(this, false)">
+              📐 19.4 meters
+            </button>
+          </div>
+          <div class="interactive-hint">
+            💡 Hint: Use the 3D Bathymetry tab to explore both lakes and see the depth difference visually!
+          </div>
+          <div class="fun-fact" style="display: none;">
+            🎉 Correct! 15.2m - 4.2m = 11.0m. Fish Lake is 11 meters deeper than McFee Lake!
+          </div>
+        </div>
+
+        <div class="question-card">
+          <div class="question-number">Question 2</div>
+          <div class="question-text">🌡️ What pattern do you see with water temperature as depth increases?</div>
+          <div class="answer-options">
+            <button class="answer-btn" onclick="answerQuestion(this, false)">
+              📈 Temperature gets warmer with depth
+            </button>
+            <button class="answer-btn" onclick="answerQuestion(this, true)">
+              📉 Temperature gets colder with depth
+            </button>
+            <button class="answer-btn" onclick="answerQuestion(this, false)">
+              ➡️ Temperature stays the same
+            </button>
+          </div>
+          <div class="interactive-hint">
+            💡 Check the Temperature Profile tab to see this pattern in our real data!
+          </div>
+          <div class="fun-fact" style="display: none;">
+            🎉 Right! Deeper water is colder because sunlight can't reach down to warm it. This creates thermal layers!
+          </div>
+        </div>
+
+        <div class="question-card">
+          <div class="question-number">Question 3</div>
+          <div class="question-text">🗺️ Why might scientists take more measurements in deeper areas?</div>
+          <div class="answer-options">
+            <button class="answer-btn" onclick="answerQuestion(this, false)">
+              🏊 Because it's easier to swim there
+            </button>
+            <button class="answer-btn" onclick="answerQuestion(this, true)">
+              🐟 Because deep areas have more complex habitats
+            </button>
+            <button class="answer-btn" onclick="answerQuestion(this, false)">
+              ⛵ Because boats work better in deep water
+            </button>
+          </div>
+          <div class="fun-fact" style="display: none;">
+            🎉 Exactly! Deep areas have different temperatures, oxygen levels, and provide unique habitats for different species!
+          </div>
+        </div>
+      </div>
+
+      <!-- High School Quiz -->
+      <div class="quiz-section" id="high-quiz">
+        <div class="question-card">
+          <div class="question-number">Question 1</div>
+          <div class="question-text">📈 Calculate the average maximum depth across all three lakes: Fish (15.2m), McFee (4.2m), Taits (18.0m)</div>
+          <div class="answer-options">
+            <button class="answer-btn" onclick="answerQuestion(this, false)">
+              📊 11.8 meters
+            </button>
+            <button class="answer-btn" onclick="answerQuestion(this, true)">
+              📊 12.5 meters
+            </button>
+            <button class="answer-btn" onclick="answerQuestion(this, false)">
+              📊 13.2 meters
+            </button>
+          </div>
+          <div class="interactive-hint">
+            💡 Use the Lake Comparison chart in the Depth Analysis tab to verify your calculation!
+          </div>
+          <div class="fun-fact" style="display: none;">
+            🎉 Correct! (15.2 + 4.2 + 18.0) ÷ 3 = 12.5m average depth across our study lakes.
+          </div>
+        </div>
+
+        <div class="question-card">
+          <div class="question-number">Question 2</div>
+          <div class="question-text">🧬 How might thermal stratification affect dissolved oxygen levels in deep lake zones?</div>
+          <div class="answer-options">
+            <button class="answer-btn" onclick="answerQuestion(this, false)">
+              ⬆️ Deep zones always have more oxygen
+            </button>
+            <button class="answer-btn" onclick="answerQuestion(this, true)">
+              ⬇️ Deep zones may have less oxygen due to limited mixing
+            </button>
+            <button class="answer-btn" onclick="answerQuestion(this, false)">
+              ➡️ Temperature doesn't affect oxygen levels
+            </button>
+          </div>
+          <div class="interactive-hint">
+            💡 Explore the 3D model to see temperature layers, then think about how water mixing works!
+          </div>
+          <div class="fun-fact" style="display: none;">
+            🎉 Excellent! Cold, dense water at the bottom doesn't mix well with warm surface water, limiting oxygen replenishment in deep zones.
+          </div>
+        </div>
+
+        <div class="question-card">
+          <div class="question-number">Question 3</div>
+          <div class="question-text">🔬 Based on our grid system data, which sampling strategy would be most effective for monitoring fish spawning areas?</div>
+          <div class="answer-options">
+            <button class="answer-btn" onclick="answerQuestion(this, false)">
+              🎯 Only sample the deepest points
+            </button>
+            <button class="answer-btn" onclick="answerQuestion(this, true)">
+              🗺️ Focus on shallow-to-medium depth transition zones
+            </button>
+            <button class="answer-btn" onclick="answerQuestion(this, false)">
+              📍 Sample randomly across all depths
+            </button>
+          </div>
+          <div class="interactive-hint">
+            💡 Check the Spatial Distribution tab to see where different depth zones are located!
+          </div>
+          <div class="fun-fact" style="display: none;">
+            🎉 Perfect! Many fish species spawn in transition zones where they can access both shallow warming areas and deeper refuges.
+          </div>
+        </div>
+      </div>
+
+      <!-- Quiz Score Display -->
+      <div class="quiz-score" id="quiz-score" style="display: none;">
+        <div id="score-text">Great job! You scored 0/0</div>
+        <button class="reset-btn" onclick="resetCurrentQuiz()">Try Again</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// Quiz functionality
+let currentAge = 'elementary';
+let quizScores = {
+  elementary: { correct: 0, total: 3 },
+  middle: { correct: 0, total: 3 },
+  high: { correct: 0, total: 3 }
+};
+
+function switchAgeGroup(age) {
+  // Update active button
+  document.querySelectorAll('.age-btn').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+  
+  // Hide all quiz sections
+  document.querySelectorAll('.quiz-section').forEach(section => {
+    section.classList.remove('active');
+  });
+  
+  // Show selected age group
+  document.getElementById(age + '-quiz').classList.add('active');
+  currentAge = age;
+  
+  // Hide score if showing
+  document.getElementById('quiz-score').style.display = 'none';
+}
+
+function answerQuestion(button, isCorrect) {
+  const questionCard = button.closest('.question-card');
+  const allButtons = questionCard.querySelectorAll('.answer-btn');
+  const funFact = questionCard.querySelector('.fun-fact');
+  
+  // Disable all buttons
+  allButtons.forEach(btn => {
+    btn.classList.add('disabled');
+    btn.onclick = null;
+  });
+  
+  // Mark correct/incorrect
+  if (isCorrect) {
+    button.classList.add('correct');
+    quizScores[currentAge].correct++;
+  } else {
+    button.classList.add('incorrect');
+    // Highlight the correct answer
+    allButtons.forEach(btn => {
+      if (btn.onclick && btn.onclick.toString().includes('true')) {
+        btn.classList.add('correct');
+      }
+    });
+  }
+  
+  // Show fun fact
+  if (funFact) {
+    funFact.style.display = 'block';
+  }
+  
+  // Check if quiz is complete
+  setTimeout(() => {
+    checkQuizComplete();
+  }, 1000);
+}
+
+function checkQuizComplete() {
+  const currentQuiz = document.getElementById(currentAge + '-quiz');
+  const answeredQuestions = currentQuiz.querySelectorAll('.question-card .answer-btn.disabled').length;
+  const totalQuestions = quizScores[currentAge].total;
+  
+  if (answeredQuestions >= totalQuestions) {
+    showQuizScore();
+  }
+}
+
+function showQuizScore() {
+  const score = quizScores[currentAge];
+  const percentage = Math.round((score.correct / score.total) * 100);
+  const scoreDisplay = document.getElementById('quiz-score');
+  const scoreText = document.getElementById('score-text');
+  
+  let message = '';
+  if (percentage >= 90) {
+    message = `🌟 Outstanding! You scored ${score.correct}/${score.total} (${percentage}%)! You're a lake science expert!`;
+  } else if (percentage >= 70) {
+    message = `🎉 Great job! You scored ${score.correct}/${score.total} (${percentage}%)! You're learning well!`;
+  } else if (percentage >= 50) {
+    message = `👍 Good effort! You scored ${score.correct}/${score.total} (${percentage}%)! Try exploring the dashboard more!`;
+  } else {
+    message = `💪 Keep trying! You scored ${score.correct}/${score.total} (${percentage}%)! Use the interactive tabs to learn more!`;
+  }
+  
+  scoreText.textContent = message;
+  scoreDisplay.style.display = 'block';
+  
+  // Scroll to score
+  scoreDisplay.scrollIntoView({ behavior: 'smooth' });
+}
+
+function resetCurrentQuiz() {
+  const currentQuiz = document.getElementById(currentAge + '-quiz');
+  
+  // Reset all buttons
+  currentQuiz.querySelectorAll('.answer-btn').forEach(btn => {
+    btn.classList.remove('correct', 'incorrect', 'disabled');
+    btn.onclick = function() {
+      const isCorrect = this.getAttribute('onclick').includes('true');
+      answerQuestion(this, isCorrect);
+    };
+  });
+  
+  // Hide fun facts
+  currentQuiz.querySelectorAll('.fun-fact').forEach(fact => {
+    fact.style.display = 'none';
+  });
+  
+  // Reset score
+  quizScores[currentAge].correct = 0;
+  document.getElementById('quiz-score').style.display = 'none';
+}
+
+function resetAllQuizzes() {
+  ['elementary', 'middle', 'high'].forEach(age => {
+    const quiz = document.getElementById(age + '-quiz');
+    
+    quiz.querySelectorAll('.answer-btn').forEach(btn => {
+      btn.classList.remove('correct', 'incorrect', 'disabled');
+      const isCorrect = btn.getAttribute('onclick').includes('true');
+      btn.onclick = function() { answerQuestion(this, isCorrect); };
+    });
+    
+    quiz.querySelectorAll('.fun-fact').forEach(fact => {
+      fact.style.display = 'none';
+    });
+    
+    quizScores[age].correct = 0;
+  });
+  
+  document.getElementById('quiz-score').style.display = 'none';
+}
+</script>
